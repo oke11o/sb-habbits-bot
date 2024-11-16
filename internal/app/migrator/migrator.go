@@ -1,4 +1,4 @@
-package app
+package migrator
 
 import (
 	"context"

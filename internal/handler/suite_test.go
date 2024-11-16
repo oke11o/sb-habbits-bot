@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/oke11o/sb-habits-bot/internal/app"
+	"github.com/oke11o/sb-habits-bot/internal/app/migrator"
 	"log/slog"
 	"os"
 	"testing"
@@ -41,7 +41,7 @@ func (s *Suite) SetupTest() {
 		File:          fmt.Sprintf("../../tests/db/test-%s.sqlite", str.RandStringRunes(8, "")),
 		MigrationPath: "../../migrations/sqlite",
 	}
-	err := app.RunMigrator(context.Background(), s.dbCfg)
+	err := migrator.RunMigrator(context.Background(), s.dbCfg)
 	s.Require().NoError(err)
 
 	dbx, err := s.createDB(s.dbCfg)

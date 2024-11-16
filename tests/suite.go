@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/oke11o/sb-habits-bot/internal/app"
+	"github.com/oke11o/sb-habits-bot/internal/app/migrator"
 	"github.com/oke11o/sb-habits-bot/internal/config"
 	"github.com/oke11o/sb-habits-bot/pgk/utils/str"
 	"github.com/stretchr/testify/suite"
@@ -46,7 +46,7 @@ func (s *Suite) createDB(cfg config.SqliteConfig) (*sqlx.DB, error) {
 func (s *Suite) InitDb(cfg config.SqliteConfig, maintainerChatID int64) {
 	s.Cfg.MaintainerChatID = maintainerChatID
 	s.DBCfg = cfg
-	err := app.RunMigrator(context.Background(), s.DBCfg)
+	err := migrator.RunMigrator(context.Background(), s.DBCfg)
 	s.Require().NoError(err)
 
 	dbx, err := s.createDB(s.DBCfg)

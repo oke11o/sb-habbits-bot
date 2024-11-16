@@ -123,6 +123,60 @@
 - Для каждой привычки можно задать баллы и гибкие параметры напоминаний.
 - Настройка баллов учитывает пропорциональное выполнение и различные режимы начисления.
 
+# Full config
+
+```yaml
+habits:
+  - name: "Утренняя зарядка"
+    type: "simple"
+    points: 10  # Баллы за выполнение
+    reminder:
+    time: "08:00"
+    days: ["mon", "tue", "wed", "thu", "fri"]
+  - name: "Отжимания"
+    type: "counter"
+    target: 30  # Цель — 30 отжиманий
+    points: 20  # Максимальные баллы
+    points_mode: "proportional"  # Пропорциональное начисление баллов
+  - name: "Проснуться в 6 утра"
+    type: "time"
+    target_time: "06:00"
+    max_time: "08:00"  # Время, после которого баллы не начисляются
+    points: 100
+    points_mode: "time_based"
+  - name: "Медитация"
+    type: "duration"
+    target_duration: "15m"  # Цель — 15 минут
+    points: 15
+    points_mode: "proportional"
+  - name: "Шаги в неделю"
+    type: "cumulative"
+    target: 70000  # Цель — 70000 шагов
+    unit: "steps"
+    points: 50
+    points_mode: "proportional"
+  - name: "Бег по утрам"
+    type: "periodic"
+    interval_days: 2  # Выполнять раз в 2 дня
+    points: 15
+  - name: "Утренний ритуал"
+    type: "checklist"
+    tasks:
+      - "Зарядка"
+      - "Душ"
+      - "Завтрак"
+    points: 20
+  - name: "Физическая активность"
+    type: "random"
+    options:
+      - "Бег"
+      - "Отжимания"
+      - "Йога"
+    points: 10
+```
+
+
+
 ---
 
 Prev:: [Введем систему баллов](6-draft-scores-for-habits.md)
