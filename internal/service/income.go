@@ -43,6 +43,13 @@ func (s *IncomeService) Income(ctx context.Context, requestID string, update tgb
 	if err != nil {
 		return model.User{}, fmt.Errorf("model.NewUserFromTgUpdate() err: %w", err)
 	}
+	usrCnt, err := s.userRepo.UserCount(ctx)
+	if err != nil {
+		return model.User{}, fmt.Errorf("userRepo.UserCount() err: %w", err)
+	}
+	if usrCnt == 0 {
+		user.IsMaintainer = true
+	}
 
 	user, err = s.userRepo.SaveUser(ctx, user)
 	if err != nil {
