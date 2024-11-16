@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS habits
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
--- Таблица записей выполнения привычек
+CREATE UNIQUE INDEX IF NOT EXISTS idx_habits_user_id_name ON habits (user_id, name);
+
 CREATE TABLE IF NOT EXISTS records
 (
     id        INTEGER PRIMARY KEY AUTOINCREMENT,
