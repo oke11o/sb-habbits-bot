@@ -41,7 +41,7 @@ func (s *HabitSuite) TearDownSuite() {
 
 }
 
-func TestSuite(t *testing.T) {
+func TestHabitSuite(t *testing.T) {
 	suite.Run(t, new(HabitSuite))
 }
 
