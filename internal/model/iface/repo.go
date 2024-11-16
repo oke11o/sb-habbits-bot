@@ -52,8 +52,8 @@ type ReminderRepo interface {
 }
 
 type ProgressRepo interface {
-	CreateProgress(ctx context.Context, progress model.Progress) error
-	UpdateProgress(ctx context.Context, progress model.Progress) (model.Progress, error)
+	CreateProgress(ctx context.Context, progress model.Progress) (model.Progress, error)
+	UpdateProgress(ctx context.Context, progress model.Progress) error
 	DeleteProgress(ctx context.Context, habitID int64) error
 
 	GetProgressByHabitID(ctx context.Context, habitID int64) (model.Progress, error)
