@@ -17,15 +17,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 	appname := "sbhabits"
-
 	err := bootstrap.RunMigrator(ctx, os.Args, appname, Version)
-	if err != nil {
-		fmt.Printf("\nSTOP with error: %s\n", err)
-		os.Exit(1)
-	}
-	fmt.Println("Migrator DONE")
-
-	err = bootstrap.Run(ctx, os.Args, appname, Version)
 	if err != nil {
 		fmt.Printf("\nSTOP with error: %s\n", err)
 		os.Exit(1)
