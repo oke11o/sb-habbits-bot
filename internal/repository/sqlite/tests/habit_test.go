@@ -33,7 +33,7 @@ func (s *HabitSuite) SetupTest() {
 }
 
 func (s *HabitSuite) TearDownTest() {
-	s.DBx.Close()
+	_ = s.DBx.Close()
 	//os.Remove(s.DBCfg.File)
 }
 

@@ -33,7 +33,7 @@ func (s *RecordSuite) SetupTest() {
 }
 
 func (s *RecordSuite) TearDownTest() {
-	s.DBx.Close()
+	_ = s.DBx.Close()
 	//os.Remove(s.DBCfg.File)
 }
 
