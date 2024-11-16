@@ -35,12 +35,11 @@ func (s *AddHabitsSuite) SetupTest() {
 func (s *AddHabitsSuite) TearDownTest() {
 	_ = s.DBx.Close()
 }
-
 func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 	ctx := context.Background()
 	userID := int64(1)
 
-	// Определяем конфигурацию для теста
+	// Определяем расширенную конфигурацию для теста
 	config := Config{
 		Habits: []HabitConfig{
 			{
@@ -62,6 +61,47 @@ func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 				Points:     20,
 				PointsMode: "proportional",
 			},
+			{
+				Name:       "Проснуться в 6 утра",
+				Type:       "time",
+				TargetTime: "06:00",
+				MaxTime:    "08:00",
+				Points:     100,
+				PointsMode: "time_based",
+			},
+			{
+				Name:           "Медитация",
+				Type:           "duration",
+				TargetDuration: "15m",
+				Points:         15,
+				PointsMode:     "proportional",
+			},
+			{
+				Name:       "Шаги в неделю",
+				Type:       "cumulative",
+				Target:     70000,
+				Unit:       "steps",
+				Points:     50,
+				PointsMode: "proportional",
+			},
+			{
+				Name:         "Бег по утрам",
+				Type:         "periodic",
+				IntervalDays: 2,
+				Points:       15,
+			},
+			{
+				Name:   "Утренний ритуал",
+				Type:   "checklist",
+				Tasks:  []string{"Зарядка", "Душ", "Завтрак"},
+				Points: 20,
+			},
+			{
+				Name:    "Физическая активность",
+				Type:    "random",
+				Options: []string{"Бег", "Отжимания", "Йога"},
+				Points:  10,
+			},
 		},
 	}
 
@@ -69,25 +109,50 @@ func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 	err := addHabitsToDB(ctx, s.HabitRepo, s.ReminderRepo, userID, config, s.Logger)
 	s.Require().NoError(err, "addHabitsToDB() должна завершаться без ошибок")
 
-	// Проверяем добавление первой привычки
-	habit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Утренняя зарядка")
-	s.Require().NoError(err, "GetHabitByName() должна завершаться без ошибок")
-	s.Equal("simple", habit.Type, "Тип привычки должен совпадать")
-	s.Equal(int64(10), habit.Points, "Баллы за привычку должны совпадать")
+	// Проверяем все добавленные привычки
+	for _, habitConfig := range config.Habits {
+		habit, err := s.HabitRepo.GetHabitByName(ctx, userID, habitConfig.Name)
+		s.Require().NoError(err, "GetHabitByName() должна завершаться без ошибок")
+		s.Equal(habitConfig.Type, habit.Type, "Тип привычки должен совпадать")
+		s.Equal(habitConfig.Points, habit.Points, "Баллы за привычку должны совпадать")
 
-	// Проверяем напоминание для первой привычки
-	reminders, err := s.ReminderRepo.GetRemindersByHabitID(ctx, habit.ID)
-	s.Require().NoError(err, "GetRemindersByHabitID() должна завершаться без ошибок")
-	s.Require().Len(reminders, 1, "Должно быть одно напоминание")
-	s.Equal("08:00", reminders[0].Time, "Время напоминания должно совпадать")
-	s.Equal("[mon tue]", reminders[0].Days, "Дни напоминания должны совпадать") //TODO: need fix [mon tue]
+		// Проверка напоминания, если оно задано
+		if habitConfig.Reminder.Time != "" {
+			reminders, err := s.ReminderRepo.GetRemindersByHabitID(ctx, habit.ID)
+			s.Require().NoError(err, "GetRemindersByHabitID() должна завершаться без ошибок")
+			s.Require().Len(reminders, 1, "Должно быть одно напоминание")
+			s.Equal(habitConfig.Reminder.Time, reminders[0].Time, "Время напоминания должно совпадать")
+			s.Equal(fmt.Sprintf("%v", habitConfig.Reminder.Days), reminders[0].Days, "Дни напоминания должны совпадать")
+		}
+	}
 
-	// Проверяем добавление второй привычки
-	habit, err = s.HabitRepo.GetHabitByName(ctx, userID, "Отжимания")
+	// Проверка специфичных полей для некоторых типов привычек
+	timeHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Проснуться в 6 утра")
 	s.Require().NoError(err)
-	s.Equal("counter", habit.Type, "Тип привычки должен совпадать")
-	s.Equal(int64(20), habit.Points, "Баллы за привычку должны совпадать")
-	s.Equal("proportional", habit.PointsMode, "Режим начисления баллов должен совпадать")
+	s.Equal("06:00", timeHabit.TargetTime)
+	s.Equal("08:00", timeHabit.MaxTime)
+
+	durationHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Медитация")
+	s.Require().NoError(err)
+	s.Equal("15m", durationHabit.TargetDuration)
+
+	cumulativeHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Шаги в неделю")
+	s.Require().NoError(err)
+	s.Equal("steps", cumulativeHabit.Unit)
+	s.Equal(int64(70000), cumulativeHabit.Target)
+
+	periodicHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Бег по утрам")
+	s.Require().NoError(err)
+	s.Equal(int64(2), periodicHabit.IntervalDays)
+
+	checklistHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Утренний ритуал")
+	s.Require().NoError(err)
+	s.Equal("checklist", checklistHabit.Type)
+	s.Equal([]string{"Зарядка", "Душ", "Завтрак"}, checklistHabit.Tasks)
+
+	randomHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Физическая активность")
+	s.Require().NoError(err)
+	s.Equal([]string{"Бег", "Отжимания", "Йога"}, randomHabit.Options)
 }
 
 func TestAddHabitsSuite(t *testing.T) {
