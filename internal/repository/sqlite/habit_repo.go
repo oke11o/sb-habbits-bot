@@ -30,8 +30,14 @@ type HabitRepo struct {
 
 func (r *HabitRepo) CreateHabit(ctx context.Context, habit model.Habit) (model.Habit, error) {
 	query := `
-		INSERT INTO habits (user_id, name, type, target, target_time, max_time, unit, points, points_mode, created_at)
-		VALUES (:user_id, :name, :type, :target, :target_time, :max_time, :unit, :points, :points_mode, :created_at)
+		INSERT INTO habits (
+			user_id, name, type, target, target_time, max_time, unit, points, points_mode,
+			target_duration, interval_days, tasks, options, created_at
+		)
+		VALUES (
+			:user_id, :name, :type, :target, :target_time, :max_time, :unit, :points, :points_mode,
+			:target_duration, :interval_days, :tasks, :options, :created_at
+		)
 	`
 	res, err := r.db.NamedExecContext(ctx, query, habit)
 	if err != nil {
@@ -48,8 +54,11 @@ func (r *HabitRepo) CreateHabit(ctx context.Context, habit model.Habit) (model.H
 func (r *HabitRepo) UpdateHabit(ctx context.Context, habit model.Habit) error {
 	query := `
 		UPDATE habits
-		SET name = :name, type = :type, target = :target, target_time = :target_time, 
-			max_time = :max_time, unit = :unit, points = :points, points_mode = :points_mode
+		SET 
+			name = :name, type = :type, target = :target, target_time = :target_time, 
+			max_time = :max_time, unit = :unit, points = :points, points_mode = :points_mode,
+			target_duration = :target_duration, interval_days = :interval_days, 
+			tasks = :tasks, options = :options
 		WHERE id = :id
 	`
 	_, err := r.db.NamedExecContext(ctx, query, habit)
@@ -61,8 +70,14 @@ func (r *HabitRepo) UpdateHabit(ctx context.Context, habit model.Habit) error {
 
 func (r *HabitRepo) UpsertHabit(ctx context.Context, habit model.Habit) (model.Habit, error) {
 	query := `
-		INSERT INTO habits (user_id, name, type, target, target_time, max_time, unit, points, points_mode, created_at)
-		VALUES (:user_id, :name, :type, :target, :target_time, :max_time, :unit, :points, :points_mode, :created_at)
+		INSERT INTO habits (
+			user_id, name, type, target, target_time, max_time, unit, points, points_mode,
+			target_duration, interval_days, tasks, options, created_at
+		)
+		VALUES (
+			:user_id, :name, :type, :target, :target_time, :max_time, :unit, :points, :points_mode,
+			:target_duration, :interval_days, :tasks, :options, :created_at
+		)
 		ON CONFLICT(user_id, name) DO UPDATE SET
 			type = EXCLUDED.type,
 			target = EXCLUDED.target,
@@ -70,7 +85,11 @@ func (r *HabitRepo) UpsertHabit(ctx context.Context, habit model.Habit) (model.H
 			max_time = EXCLUDED.max_time,
 			unit = EXCLUDED.unit,
 			points = EXCLUDED.points,
-			points_mode = EXCLUDED.points_mode
+			points_mode = EXCLUDED.points_mode,
+			target_duration = EXCLUDED.target_duration,
+			interval_days = EXCLUDED.interval_days,
+			tasks = EXCLUDED.tasks,
+			options = EXCLUDED.options
 	`
 
 	res, err := r.db.NamedExecContext(ctx, query, habit)

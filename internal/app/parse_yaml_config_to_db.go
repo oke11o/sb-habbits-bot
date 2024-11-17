@@ -40,16 +40,20 @@ func addHabitsToDB(ctx context.Context, habitRepo iface.HabitRepo, reminderRepo 
 	for _, habit := range config.Habits {
 		// Создаём запись привычки
 		habitRecord := model.Habit{
-			UserID:     userID,
-			Name:       habit.Name,
-			Type:       habit.Type,
-			Target:     habit.Target,
-			TargetTime: habit.TargetTime,
-			MaxTime:    habit.MaxTime,
-			Points:     habit.Points,
-			PointsMode: habit.PointsMode,
-			Unit:       habit.Unit,
-			CreatedAt:  time.Now(),
+			UserID:         userID,
+			Name:           habit.Name,
+			Type:           habit.Type,
+			Target:         habit.Target,
+			TargetTime:     habit.TargetTime,
+			MaxTime:        habit.MaxTime,
+			Unit:           habit.Unit,
+			Points:         habit.Points,
+			PointsMode:     habit.PointsMode,
+			TargetDuration: habit.TargetDuration,
+			IntervalDays:   habit.IntervalDays,
+			Tasks:          habit.Tasks,
+			Options:        habit.Options,
+			CreatedAt:      time.Now(),
 		}
 
 		habitRecord, err := habitRepo.CreateHabit(ctx, habitRecord)

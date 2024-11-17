@@ -1,16 +1,20 @@
 CREATE TABLE IF NOT EXISTS habits
 (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     INTEGER NOT NULL,
-    name        TEXT    NOT NULL,
-    type        TEXT    NOT NULL,
-    target      INTEGER   DEFAULT 0,
-    target_time TEXT      DEFAULT NULL,
-    max_time    TEXT      DEFAULT NULL,
-    unit        TEXT      DEFAULT NULL,
-    points      INTEGER   DEFAULT 0,
-    points_mode TEXT      DEFAULT 'fixed',
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL,
+    name            TEXT    NOT NULL,
+    type            TEXT    NOT NULL,
+    target          INTEGER   DEFAULT 0,
+    target_time     TEXT      DEFAULT NULL,
+    max_time        TEXT      DEFAULT NULL,
+    unit            TEXT      DEFAULT NULL,
+    points          INTEGER   DEFAULT 0,
+    points_mode     TEXT      DEFAULT 'fixed',
+    target_duration TEXT      DEFAULT NULL,
+    interval_days   INTEGER   DEFAULT 0,
+    tasks           TEXT      DEFAULT NULL,
+    options         TEXT      DEFAULT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
