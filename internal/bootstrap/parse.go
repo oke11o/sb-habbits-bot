@@ -26,7 +26,7 @@ func RunParseYAMLConfigToDB(ctx context.Context, args []string, appname, version
 	err = app.ParseYAMLConfigToDB(ctx, cfg, userID, args[2], l)
 	if err != nil {
 		l.ErrorContext(ctx, "app.ParseYAMLConfigToDB error", slog.String("error", err.Error()))
-		return fmt.Errorf("app.ParseYAMLConfigToDB error: ", err)
+		return fmt.Errorf("app.ParseYAMLConfigToDB error: %w", err)
 	}
 	return nil
 }

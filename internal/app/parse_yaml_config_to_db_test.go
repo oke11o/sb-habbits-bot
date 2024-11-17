@@ -50,20 +50,18 @@ func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 	err = addHabitsToDB(ctx, s.HabitRepo, s.ReminderRepo, userID, cfg, s.Logger)
 	s.Require().NoError(err, "addHabitsToDB() должна завершаться без ошибок")
 
-	// Проверяем все добавленные привычки
 	for _, habitConfig := range cfg.Habits {
 		habit, err := s.HabitRepo.GetHabitByName(ctx, userID, habitConfig.Name)
 		s.Require().NoError(err, "GetHabitByName() должна завершаться без ошибок")
 		s.Equal(habitConfig.Type, habit.Type, "Тип привычки должен совпадать")
 		s.Equal(habitConfig.Points, habit.Points, "Баллы за привычку должны совпадать")
 
-		// Проверка напоминания, если оно задано
 		if habitConfig.Reminder.Time != "" {
 			reminders, err := s.ReminderRepo.GetRemindersByHabitID(ctx, habit.ID)
 			s.Require().NoError(err, "GetRemindersByHabitID() должна завершаться без ошибок")
 			s.Require().Len(reminders, 1, "Должно быть одно напоминание")
 			s.Equal(habitConfig.Reminder.Time, reminders[0].Time, "Время напоминания должно совпадать")
-			s.Equal(fmt.Sprintf("%v", habitConfig.Reminder.Days), reminders[0].Days, "Дни напоминания должны совпадать")
+			s.Equal(habitConfig.Reminder.Days, []string(reminders[0].Days), "Дни напоминания должны совпадать")
 		}
 	}
 
@@ -94,6 +92,11 @@ func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 	randomHabit, err := s.HabitRepo.GetHabitByName(ctx, userID, "Физическая активность")
 	s.Require().NoError(err)
 	s.Equal(model.StringSlice{"Бег", "Отжимания", "Йога"}, randomHabit.Options)
+
+	counterHabitExtended, err := s.HabitRepo.GetHabitByName(ctx, userID, "Прогулка на свежем воздухе")
+	s.Require().NoError(err)
+	s.Equal("steps", counterHabitExtended.Unit)
+	s.Equal(int64(5000), counterHabitExtended.Target)
 }
 
 func TestAddHabitsSuite(t *testing.T) {

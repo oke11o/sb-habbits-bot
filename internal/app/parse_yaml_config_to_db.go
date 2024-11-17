@@ -66,7 +66,7 @@ func addHabitsToDB(ctx context.Context, habitRepo iface.HabitRepo, reminderRepo 
 				HabitID: habitRecord.ID,
 				UserID:  userID,
 				Time:    habit.Reminder.Time,
-				Days:    fmt.Sprintf("%v", habit.Reminder.Days),
+				Days:    habit.Reminder.Days,
 			}
 
 			_, err := reminderRepo.CreateReminder(ctx, reminder)

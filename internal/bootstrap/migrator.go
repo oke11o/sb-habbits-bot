@@ -16,7 +16,7 @@ func RunMigrator(ctx context.Context, _ []string, appname, version string) error
 	err = migrator.RunMigrator(ctx, cfg.Sqlite)
 	if err != nil {
 		l.ErrorContext(ctx, "app.RunMigrator error", slog.String("error", err.Error()))
-		return fmt.Errorf("app.RunMigrator error: ", err)
+		return fmt.Errorf("app.RunMigrator error: %w", err)
 	}
 	return nil
 }

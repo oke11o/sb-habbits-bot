@@ -10,6 +10,15 @@ habits:
     target: 30  # Цель — 30 отжиманий
     points: 20  # Максимальные баллы
     points_mode: "proportional"  # Пропорциональное начисление баллов
+  - name: "Прогулка на свежем воздухе"
+    type: "counter"
+    target: 5000
+    unit: "steps"
+    points: 40
+    points_mode: "proportional"
+    reminder:
+      time: "18:00"
+      days: ["sat", "sun"]
   - name: "Проснуться в 6 утра"
     type: "time"
     target_time: "06:00"

@@ -43,7 +43,7 @@ func (s *ReminderSuite) Test_CreateReminder() {
 		HabitID: 1,
 		UserID:  1,
 		Time:    "08:00",
-		Days:    "mon,tue,wed",
+		Days:    model.StringSlice{"mon", "tue", "wed"},
 	}
 
 	createdReminder, err := s.Repo.CreateReminder(ctx, reminder)
@@ -58,14 +58,14 @@ func (s *ReminderSuite) Test_UpdateReminder() {
 		HabitID: 1,
 		UserID:  1,
 		Time:    "08:00",
-		Days:    "mon,tue",
+		Days:    model.StringSlice{"mon", "tue"},
 	}
 
 	createdReminder, err := s.Repo.CreateReminder(ctx, reminder)
 	s.Require().NoError(err)
 
 	createdReminder.Time = "09:00"
-	createdReminder.Days = "wed,thu"
+	createdReminder.Days = model.StringSlice{"wed", "thu"}
 	err = s.Repo.UpdateReminder(ctx, createdReminder)
 	s.Require().NoError(err, "UpdateReminder() должен работать без ошибок")
 
@@ -73,7 +73,7 @@ func (s *ReminderSuite) Test_UpdateReminder() {
 	s.Require().NoError(err)
 	s.Require().Len(updatedReminder, 1, "Должно быть одно напоминание")
 	s.Equal("09:00", updatedReminder[0].Time, "Время напоминания должно быть обновлено")
-	s.Equal("wed,thu", updatedReminder[0].Days, "Дни напоминания должны быть обновлены")
+	s.Equal(model.StringSlice{"wed", "thu"}, updatedReminder[0].Days, "Дни напоминания должны быть обновлены")
 }
 
 func (s *ReminderSuite) Test_DeleteReminder() {
@@ -82,7 +82,7 @@ func (s *ReminderSuite) Test_DeleteReminder() {
 		HabitID: 1,
 		UserID:  1,
 		Time:    "10:00",
-		Days:    "fri",
+		Days:    model.StringSlice{"fri"},
 	}
 
 	createdReminder, err := s.Repo.CreateReminder(ctx, reminder)
@@ -100,8 +100,8 @@ func (s *ReminderSuite) Test_GetRemindersByHabitID() {
 	ctx := context.Background()
 	habitID := int64(1)
 	reminders := []model.Reminder{
-		{HabitID: habitID, UserID: 1, Time: "08:00", Days: "mon,tue"},
-		{HabitID: habitID, UserID: 1, Time: "09:00", Days: "wed,thu"},
+		{HabitID: habitID, UserID: 1, Time: "08:00", Days: model.StringSlice{"mon", "tue"}},
+		{HabitID: habitID, UserID: 1, Time: "09:00", Days: model.StringSlice{"wed", "thu"}},
 	}
 
 	for _, reminder := range reminders {
@@ -120,8 +120,8 @@ func (s *ReminderSuite) Test_GetRemindersByUserID() {
 	ctx := context.Background()
 	userID := int64(1)
 	reminders := []model.Reminder{
-		{HabitID: 1, UserID: userID, Time: "07:00", Days: "mon"},
-		{HabitID: 2, UserID: userID, Time: "08:00", Days: "tue"},
+		{HabitID: 1, UserID: userID, Time: "07:00", Days: model.StringSlice{"mon"}},
+		{HabitID: 2, UserID: userID, Time: "08:00", Days: model.StringSlice{"tue"}},
 	}
 
 	for _, reminder := range reminders {
