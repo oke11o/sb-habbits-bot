@@ -16,6 +16,10 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+func TestAddHabitsSuite(t *testing.T) {
+	suite.Run(t, new(AddHabitsSuite))
+}
+
 type AddHabitsSuite struct {
 	tests.Suite
 	HabitRepo    *sqlite.HabitRepo
@@ -38,7 +42,7 @@ func (s *AddHabitsSuite) TearDownTest() {
 }
 
 func (s *AddHabitsSuite) Test_AddHabitsToDB() {
-	file, err := os.ReadFile("full_config.yaml")
+	file, err := os.ReadFile("../../tests/testdata/full_config.yaml")
 	s.Require().NoError(err, "Ошибка чтения YAML файла")
 
 	cfg := Config{}
@@ -47,8 +51,8 @@ func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 	ctx := context.Background()
 	userID := int64(1)
 
-	err = addHabitsToDB(ctx, s.HabitRepo, s.ReminderRepo, userID, cfg, s.Logger)
-	s.Require().NoError(err, "addHabitsToDB() должна завершаться без ошибок")
+	err = AddHabitsToDB(ctx, s.HabitRepo, s.ReminderRepo, userID, cfg, s.Logger)
+	s.Require().NoError(err, "AddHabitsToDB() должна завершаться без ошибок")
 
 	for _, habitConfig := range cfg.Habits {
 		habit, err := s.HabitRepo.GetHabitByName(ctx, userID, habitConfig.Name)
@@ -97,8 +101,4 @@ func (s *AddHabitsSuite) Test_AddHabitsToDB() {
 	s.Require().NoError(err)
 	s.Equal("steps", counterHabitExtended.Unit)
 	s.Equal(int64(5000), counterHabitExtended.Target)
-}
-
-func TestAddHabitsSuite(t *testing.T) {
-	suite.Run(t, new(AddHabitsSuite))
 }

@@ -28,7 +28,7 @@ func ParseYAMLConfigToDB(ctx context.Context, cfg config.Config, userID int64, f
 
 	habitRepo := sqlite.NewHabitRepoWithDB(db)
 	reminderRepo := sqlite.NewReminderRepo(db)
-	err = addHabitsToDB(ctx, habitRepo, reminderRepo, userID, habitCfg, l)
+	err = AddHabitsToDB(ctx, habitRepo, reminderRepo, userID, habitCfg, l)
 	if err != nil {
 		return fmt.Errorf("add habits to db: %w", err)
 	}
@@ -36,7 +36,7 @@ func ParseYAMLConfigToDB(ctx context.Context, cfg config.Config, userID int64, f
 	return nil
 }
 
-func addHabitsToDB(ctx context.Context, habitRepo iface.HabitRepo, reminderRepo iface.ReminderRepo, userID int64, config Config, l *slog.Logger) error {
+func AddHabitsToDB(ctx context.Context, habitRepo iface.HabitRepo, reminderRepo iface.ReminderRepo, userID int64, config Config, l *slog.Logger) error {
 	for _, habit := range config.Habits {
 		// Создаём запись привычки
 		habitRecord := model.Habit{
