@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"fmt"
+	"github.com/oke11o/sb-habits-bot/internal/fsm/done"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -53,6 +54,9 @@ func (r *Router) resolveCommandMachine(update tgbotapi.Update) fsm.Machine {
 
 	if strings.HasPrefix(update.Message.Text, help.HelpCommand) || strings.HasPrefix(update.Message.Text, StartCommand) {
 		return help.NewHelp(r.deps)
+	}
+	if strings.HasPrefix(update.Message.Text, done.DoneCommand) {
+		return done.NewDone(r.deps)
 	}
 	return nil
 }

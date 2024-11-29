@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/oke11o/sb-habits-bot/internal/repository/sqlite"
+	"github.com/oke11o/sb-habits-bot/internal/service"
 	"log/slog"
 
 	"github.com/oke11o/sb-habits-bot/internal/config"
@@ -22,13 +23,14 @@ type incomer interface {
 	Income(ctx context.Context, requestID string, update tgbotapi.Update) (model.User, error)
 }
 
-func New(cfg config.Config, l *slog.Logger, income incomer, userRepo iface.UserRepo, sessionRepo iface.SessionRepo) *Handler {
+func New(cfg config.Config, l *slog.Logger, income incomer, userRepo iface.UserRepo, sessionRepo iface.SessionRepo, doneService *service.Done) *Handler {
 	return &Handler{
 		cfg:         cfg,
 		logger:      l,
 		income:      income,
 		userRepo:    userRepo,
 		sessionRepo: sessionRepo,
+		doneService: doneService,
 	}
 }
 
@@ -40,6 +42,7 @@ type Handler struct {
 	userRepo    iface.UserRepo
 	sessionRepo iface.SessionRepo
 	incomeRepo  *sqlite.IncomeRepo
+	doneService *service.Done
 }
 
 func (h *Handler) SetSender(sender iface.Sender) {
@@ -57,7 +60,7 @@ func (h *Handler) HandleUpdate(ctx context.Context, update tgbotapi.Update) erro
 	}
 	ctx = log.AppendCtx(ctx, slog.Int64("user_id", user.ID))
 
-	deps := fsm.NewDeps(h.cfg, h.sessionRepo, h.sender, h.logger)
+	deps := fsm.NewDeps(h.cfg, h.sessionRepo, h.sender, h.doneService, h.logger)
 	routr, err := router.NewRouter(deps)
 	if err != nil {
 		h.logger.ErrorContext(ctx, "fsm.NewRouter Error", "error", err.Error())

@@ -22,6 +22,8 @@ func Run(ctx context.Context, args []string, appname, version string) error {
 	var userRepo iface.UserRepo
 	var incomeRepo iface.IncomeRepo
 	var sessionRepo iface.SessionRepo
+	var habitRepo iface.HabitRepo
+	var recordRepo iface.RecordRepo
 	switch cfg.DBType {
 	case sqlite.DBType:
 		sqliteDb, err := sqlite.NewDb(cfg.Sqlite)
@@ -32,6 +34,8 @@ func Run(ctx context.Context, args []string, appname, version string) error {
 		userRepo = sqlite.NewUserRepoWithDB(sqliteDb)
 		incomeRepo = sqlite.NewIncomeRepoWithDB(sqliteDb)
 		sessionRepo = sqlite.NewSessionRepoWithDB(sqliteDb)
+		habitRepo = sqlite.NewHabitRepoWithDB(sqliteDb)
+		recordRepo = sqlite.NewRecordRepo(sqliteDb)
 	//case mongo.DBType:
 	//	userRepo = mongo.NewUserRepo()
 	//case pg.DBType:
@@ -40,9 +44,9 @@ func Run(ctx context.Context, args []string, appname, version string) error {
 		l.ErrorContext(ctx, "error sqlite.NewUserRepo()", slog.String("error", err.Error()))
 		return fmt.Errorf("unknown db_type %s", cfg.DBType)
 	}
-	_ = userRepo
 	income := service.NewIncomeServce(userRepo, incomeRepo)
-	b := app.NewBot(cfg, l, handler.New(cfg, l, income, userRepo, sessionRepo))
+	doneService := service.NewDone(habitRepo, recordRepo)
+	b := app.NewBot(cfg, l, handler.New(cfg, l, income, userRepo, sessionRepo, doneService))
 	err = b.Run(ctx)
 	if err != nil {
 		l.ErrorContext(ctx, "error bot.Run()", slog.String("error", err.Error()))
